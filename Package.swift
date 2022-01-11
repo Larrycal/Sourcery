@@ -10,7 +10,6 @@ let package = Package(
     products: [
         .executable(name: "sourcery", targets: ["Sourcery"]),
         .library(name: "SourceryRuntime", targets: ["SourceryRuntime"]),
-        .library(name: "SourceryJS", targets: ["SourceryJS"]),
         .library(name: "SourcerySwift", targets: ["SourcerySwift"]),
         .library(name: "SourceryFramework", targets: ["SourceryFramework"]),
     ],
@@ -26,14 +25,12 @@ let package = Package(
         .target(name: "Sourcery", dependencies: [
             "SourceryFramework",
             "SourceryRuntime",
-            "SourceryJS",
             "SourcerySwift",
             "Commander",
             "PathKit",
             "SourceKittenFramework",
             "StencilSwiftKit",
             "XcodeProj",
-            "TryCatch",
         ]),
         .target(name: "SourceryRuntime"),
         .target(name: "SourceryUtils", dependencies: [
@@ -45,14 +42,10 @@ let package = Package(
           "SourceryUtils",
           "SourceryRuntime"
         ]),
-        .target(name: "SourceryJS", dependencies: [
-          "PathKit"
-        ]),
         .target(name: "SourcerySwift", dependencies: [
           "PathKit",
           "SourceryRuntime",
           "SourceryUtils"
         ]),
-        .target(name: "TryCatch", path: "TryCatch"),
     ]
 )

@@ -8,9 +8,9 @@ import PathKit
 import SourceryFramework
 import SourceryUtils
 import SourceryRuntime
-import SourceryJS
+//import SourceryJS
 import SourcerySwift
-import TryCatch
+//import TryCatch
 import XcodeProj
 
 class Sourcery {
@@ -209,12 +209,6 @@ class Sourcery {
             if $0.extension == "swifttemplate" {
                 let cachePath = cachesDir(sourcePath: $0)
                 return try SwiftTemplate(path: $0, cachePath: cachePath, version: type(of: self).version)
-            } else if $0.extension == "ejs" {
-                guard EJSTemplate.ejsPath != nil else {
-                    Log.warning("Skipping template \($0). JavaScript templates require EJS path to be set manually when using Sourcery built with Swift Package Manager. Use `--ejsPath` command line argument to set it.")
-                    return nil
-                }
-                return try JavaScriptTemplate(path: $0)
             } else {
                 return try StencilTemplate(path: $0)
             }
@@ -346,17 +340,11 @@ extension Sourcery {
 
     private func load(artifacts: String, modifiedDate: Date) -> FileParserResult? {
         var unarchivedResult: FileParserResult?
-        SwiftTryCatch.try({
-
-            if let unarchived = NSKeyedUnarchiver.unarchiveObject(withFile: artifacts) as? FileParserResult {
-                if unarchived.sourceryVersion == Sourcery.version, unarchived.modifiedDate == modifiedDate {
-                    unarchivedResult = unarchived
-                }
+        if let unarchived = NSKeyedUnarchiver.unarchiveObject(withFile: artifacts) as? FileParserResult {
+            if unarchived.sourceryVersion == Sourcery.version, unarchived.modifiedDate == modifiedDate {
+                unarchivedResult = unarchived
             }
-        }, catch: { _ in
-            Log.warning("Failed to unarchive \(artifacts) due to error, re-parsing")
-        }, finallyBlock: {})
-
+        }
         return unarchivedResult
     }
 }
@@ -474,15 +462,11 @@ extension Sourcery {
         }
 
         var result: String = ""
-        SwiftTryCatch.try({
-            do {
-                result = try Generator.generate(parsingResult.types, functions: parsingResult.functions, template: template, arguments: self.arguments)
-            } catch {
-                Log.error(error)
-            }
-        }, catch: { error in
-            result = error?.description ?? ""
-        }, finallyBlock: {})
+        do {
+            result = try Generator.generate(parsingResult.types, functions: parsingResult.functions, template: template, arguments: self.arguments)
+        } catch {
+            Log.error(error)
+        }
 
         return try processRanges(in: parsingResult, result: result, outputPath: outputPath)
     }
